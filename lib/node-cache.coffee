@@ -180,7 +180,7 @@ module.exports = class NodeCache extends EventEmitter
 	checkAllData: ()=>
 
 		# 检查所有数据
-		_.forEach @data, (key)->
+		for key of @data
 			@_checkData(key)
 
 		# 开启周期检查
@@ -195,10 +195,11 @@ module.exports = class NodeCache extends EventEmitter
 	# @api private
 	_checkData: (key)=>
 		wrapValue = @data[key]
+
 		# 设定了过期时间，且已经过期
 		if wrapValue.t isnt 0 and wrapValue.t < Date.now()
 			@del(key)
-			@emit('expired', key, @_unwrap(wrapValue))
+			@emit('expired', key)
 			return false
 		else
 			return true
