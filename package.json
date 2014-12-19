@@ -1,0 +1,35 @@
+{
+    "name": "node-cache",
+    "version": "0.0.0",
+    "description": "NodeJS internal in memory cache.",
+    "main": "index.js",
+    "scripts": {
+        "test": "mocha test.js"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/khowarizmi/node-cache.git"
+    },
+    "keywords": [
+        "cache",
+        "caching",
+        "local",
+        "multi",
+        "memory",
+        "internal",
+        "node",
+        "memcached"
+    ],
+    "author": "khowarizmi",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/khowarizmi/node-cache/issues"
+    },
+    "homepage": "https://github.com/khowarizmi/node-cache",
+    "dependencies": {
+        "lodash": "*"
+    },
+    "devDependencies": {
+        "mocha": "*"
+    }
+}
