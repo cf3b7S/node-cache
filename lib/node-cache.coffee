@@ -45,6 +45,7 @@ module.exports = class NodeCache extends EventEmitter
 	# @return {Boolean}
 	# @api public
 	set: (key, value, ttl = @options.ttl)=>
+		if !_.isString(key) then return false
 		keyExist = false
 
 		# 数据已经存在，则恢复统计信息
@@ -129,7 +130,7 @@ module.exports = class NodeCache extends EventEmitter
 			delCount += @del(key)
 		return delCount
 
-	# 更新键的存货时间(未过期)
+	# 更新单个键的存货时间，如果改键还未过期
 	# @param {String} key
 	# @param {Number} ttl
 	# @return {Boolean}
@@ -142,7 +143,7 @@ module.exports = class NodeCache extends EventEmitter
 			return false
 
 
-	# 获取所有键的数组
+	# 获取所有键
 	# @return {Array}
 	# @api public
 	keys: =>
@@ -261,20 +262,3 @@ module.exports = class NodeCache extends EventEmitter
 			@options.objectValueSize * _.size(value)
 		else
 			0
-
-	# 错误处理，暂时未用到
-	_error: ( type, data = {}, cb )=>
-		# generate the error object
-		error = new Error()
-		error.name = type
-		error.errorcode = type
-		error.msg = "-"
-		error.data = data
-
-		if cb and _.isFunction( cb )
-			# return the error
-			cb( error, null )
-			return
-		else
-			# if no callback is defined return the error object
-			return error

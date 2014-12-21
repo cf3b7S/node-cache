@@ -27,7 +27,8 @@
     },
     "homepage": "https://github.com/khowarizmi/node-cache",
     "dependencies": {
-        "lodash": "*"
+        "lodash": "*",
+        "assert": "*"
     },
     "devDependencies": {
         "mocha": "*"
