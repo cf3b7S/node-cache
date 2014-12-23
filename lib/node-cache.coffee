@@ -17,8 +17,6 @@ module.exports = class NodeCache extends EventEmitter
 			objectValueSize: 80
 			arrayValueSize: 40
 
-			# 存活事件，0表示永久
-			stdTTL: 0
 
 			# 时间的倍乘，乘以1000表示单位为秒（s）
 			timeMultiplier: 1000
@@ -63,6 +61,7 @@ module.exports = class NodeCache extends EventEmitter
 			@stats.keys++
 		@stats.vsize += @_getValLength(value)
 
+		@emit('set', key, value)
 		return true
 
 	# 设置多个键值对的值，及其过期时间
@@ -83,9 +82,14 @@ module.exports = class NodeCache extends EventEmitter
 		if !_.isString(key) then return null
 		if @data[key]? and @_checkData(key)
 			@stats.hits++
-			return @_unwrap(@data[key])
+			value = @_unwrap(@data[key])
+
+			@emit('get', key, value)
+			return value
 		else
 			@stats.misses++
+
+			@emit('expired', key)
 			return null
 
 	# 获取多个值
@@ -135,7 +139,7 @@ module.exports = class NodeCache extends EventEmitter
 	# @param {Number} ttl
 	# @return {Boolean}
 	# @api public
-	ttl: (key, ttl = @options.stdTTL)=>
+	ttl: (key, ttl = @options.ttl)=>
 		if @data[key]? and @_checkData(key)
 			@data[key] = @_wrap(@_unwrap(@data[key]), ttl)
 			return true
@@ -173,7 +177,7 @@ module.exports = class NodeCache extends EventEmitter
 
 		# 触发清空事件
 		@emit('flush')
-		return
+		return true
 
 	# 检查所有数据，删除所有不合法数据
 	# 开启循环检查
@@ -215,7 +219,7 @@ module.exports = class NodeCache extends EventEmitter
 	# @param {Number} ttl
 	# @return {Object}
 	# @api private
-	_wrap: (value, ttl = @options.stdTTL)=>
+	_wrap: (value, ttl = @options.ttl)=>
 		now = Date.now()
 		ttlMultiplicator = @options.timeMultiplier
 

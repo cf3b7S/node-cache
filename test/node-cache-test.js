@@ -24,9 +24,12 @@ randomString = function(length) {
 };
 
 describe('node-cache', function() {
-  var key, mdata, mkey, mvalue, value;
+  var key, keyTTL, mdata, mkey, mvalue, value, value2, valueTTL;
   key = randomString();
   value = randomString(100);
+  value2 = randomString(100);
+  keyTTL = randomString();
+  valueTTL = randomString(100);
   mdata = [
     {
       key: randomString(),
@@ -38,7 +41,7 @@ describe('node-cache', function() {
   ];
   mkey = _.pluck(mdata, 'key');
   mvalue = _.pluck(mdata, 'value');
-  describe('#set()', function() {
+  describe('#set', function() {
     it('should return true', function() {
       return assert.equal(true, myCache.set(key, value));
     });
@@ -52,7 +55,7 @@ describe('node-cache', function() {
       return assert.equal(100, myCache.stats.vsize);
     });
   });
-  describe('#get()', function() {
+  describe('#get', function() {
     it('should equal value', function() {
       return assert.equal(value, myCache.get(key));
     });
@@ -60,15 +63,72 @@ describe('node-cache', function() {
       return assert.equal(1, myCache.stats.hits);
     });
   });
-  describe('#del()', function() {
+  describe('#get undefined key', function() {
+    it('should return null', function() {
+      return assert.equal(null, myCache.get('xxx'));
+    });
+    return it('misses return 1', function() {
+      return assert.equal(1, myCache.stats.misses);
+    });
+  });
+  describe('#update', function() {
+    it('should equal value2', function() {
+      myCache.set(key, value2);
+      return assert.equal(value2, myCache.get(key));
+    });
+    return it('hits should equal 2', function() {
+      return assert.equal(2, myCache.stats.hits);
+    });
+  });
+  describe('#del', function() {
     it('should return 1', function() {
       return assert.equal(1, myCache.del(key));
     });
-    return it('keys should equal 0', function() {
+    it('keys should equal 0', function() {
       return assert.equal(0, myCache.stats.keys);
     });
+    return it('undefined key should return 0', function() {
+      return assert.equal(0, myCache.del('xxx'));
+    });
   });
-  describe('#mset()', function() {
+  describe('#ttl', function() {
+    it('unexist key should return false', function() {
+      return assert.equal(false, myCache.ttl(keyTTL, 1));
+    });
+    return it('exist key should return true', function() {
+      myCache.set(keyTTL, valueTTL);
+      return assert.equal(true, myCache.ttl(keyTTL, 1));
+    });
+  });
+  describe('#set with ttl', function() {
+    it('should equal value', function(done) {
+      this.timeout(2000);
+      return setTimeout(function() {
+        assert.equal(valueTTL, myCache.get(keyTTL));
+        return done();
+      }, 500);
+    });
+    return it('should equal null', function(done) {
+      this.timeout(2000);
+      return setTimeout(function() {
+        assert.equal(null, myCache.get(keyTTL));
+        return done();
+      }, 1500);
+    });
+  });
+  describe('#flushAll', function() {
+    it('should return true', function() {
+      return assert.equal(true, myCache.flushAll(key));
+    });
+    return it('stats should clear', function() {
+      assert.equal(0, myCache.stats.hits);
+      assert.equal(0, myCache.stats.misses);
+      assert.equal(0, myCache.stats.keys);
+      assert.equal(0, myCache.stats.ksize);
+      return assert.equal(0, myCache.stats.vsize);
+    });
+  });
+  describe('#mset', function() {
     it('should return true', function() {
       return assert.equal(true, myCache.mset(mdata));
     });
@@ -82,24 +142,39 @@ describe('node-cache', function() {
       return assert.equal(200, myCache.stats.vsize);
     });
   });
-  describe('#mget()', function() {
+  describe('#mget', function() {
     it('should equal value', function() {
       var keyTmp;
       keyTmp = myCache.mget(mkey);
       assert.equal(mvalue[0], keyTmp[0]);
       return assert.equal(mvalue[1], keyTmp[1]);
     });
-    return it('hits should equal 3', function() {
-      return assert.equal(3, myCache.stats.hits);
+    return it('hits should equal 2', function() {
+      return assert.equal(2, myCache.stats.hits);
     });
   });
-  return describe('#mdel()', function() {
+  describe('#mdel', function() {
     it('should return 2', function() {
       return assert.equal(2, myCache.mdel(mkey));
     });
     return it('keys should equal 0', function() {
       return assert.equal(0, myCache.stats.keys);
     });
+  });
+  myCache.on('set', function(key, value) {
+    return console.log('set', key);
+  });
+  myCache.on('get', function(key, value) {
+    return console.log('get', key);
+  });
+  myCache.on('del', function(key, value) {
+    return console.log('del', key);
+  });
+  myCache.on('expired', function(key, value) {
+    return console.log('expired', key);
+  });
+  return myCache.on('flush', function() {
+    return console.log('flush');
   });
 });
 
