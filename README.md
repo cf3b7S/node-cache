@@ -3,9 +3,15 @@ node-cache
 
 NodeJS internal in memory cache.
 
+Written with coffee.
+
+Inspired by [nodecache](https://github.com/tcs-de/nodecache).
 
 #Install
 ---
+```
+sudo npm install n-cache
+```
 
 #Usage
 ---
