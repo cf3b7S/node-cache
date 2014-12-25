@@ -1,10 +1,10 @@
 {
-    "name": "node-cache",
-    "version": "0.0.0",
+    "name": "n-cache",
+    "version": "0.0.1",
     "description": "NodeJS internal in memory cache.",
     "main": "index.js",
     "scripts": {
-        "test": "mocha test.js"
+        "test": "mocha node-cache-test.js"
     },
     "repository": {
         "type": "git",
@@ -27,10 +27,10 @@
     },
     "homepage": "https://github.com/khowarizmi/node-cache",
     "dependencies": {
-        "lodash": "*",
-        "assert": "*"
+        "lodash": "*"
     },
     "devDependencies": {
-        "mocha": "*"
+        "mocha": "*",
+        "assert": "*"
     }
 }
